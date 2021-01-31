@@ -82,7 +82,7 @@ public class UserMealsUtil {
     public static List<UserMealWithExcess> filteredByStreamInOnePass(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         class CaloriesCounter {
             private int calories;
-            private List<UserMeal> userMeals = new ArrayList<>();
+            private final List<UserMeal> userMeals = new ArrayList<>();
 
             public CaloriesCounter(UserMeal userMeal) {
                 calories = userMeal.getCalories();
