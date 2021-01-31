@@ -66,11 +66,13 @@ public class UserMealsUtil {
     public static List<UserMealWithExcess> filteredByStreamInOnePass(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         class CaloriesCounter {
             private int calories;
-            private final List<UserMeal> userMeals = new ArrayList<>();
+            private final List<UserMeal> filteredUserMeals = new ArrayList<>();
 
-            public CaloriesCounter(UserMeal userMeal) {
+            public CaloriesCounter(UserMeal userMeal, LocalTime startTime, LocalTime endTime) {
                 calories = userMeal.getCalories();
-                userMeals.add(userMeal);
+                if (TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime)) {
+                    filteredUserMeals.add(userMeal);
+                }
             }
         }
 
@@ -82,9 +84,12 @@ public class UserMealsUtil {
 
             @Override
             public BiConsumer<Map<LocalDate, CaloriesCounter>, UserMeal> accumulator() {
-                return (localDateCaloriesCounterMap, userMeal) -> localDateCaloriesCounterMap.merge(userMeal.getDate(), new CaloriesCounter(userMeal), (oldValue, newValue) -> {
+                return (localDateCaloriesCounterMap, userMeal) -> localDateCaloriesCounterMap.merge(userMeal.getDate(),
+                                                                            new CaloriesCounter(userMeal, startTime, endTime), (oldValue, newValue) -> {
                     oldValue.calories += userMeal.getCalories();
-                    oldValue.userMeals.add(userMeal);
+                    if (TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime)) {
+                        oldValue.filteredUserMeals.add(userMeal);
+                    }
                     return oldValue;
                 });
             }
@@ -94,7 +99,7 @@ public class UserMealsUtil {
                 return (map1, map2) -> {
                     map2.forEach(((localDate, caloriesCounter) -> map1.merge(localDate, caloriesCounter, (oldValue, newValue) -> {
                         oldValue.calories += newValue.calories;
-                        oldValue.userMeals.addAll(newValue.userMeals);
+                        oldValue.filteredUserMeals.addAll(newValue.filteredUserMeals);
                         return oldValue;
                     })));
                     return map1;
@@ -103,16 +108,9 @@ public class UserMealsUtil {
 
             @Override
             public Function<Map<LocalDate, CaloriesCounter>, List<UserMealWithExcess>> finisher() {
-                return localDateCaloriesCounterMap -> {
-                    List<UserMealWithExcess> filteredUserMealsWithExcess = new ArrayList<>();
-                    localDateCaloriesCounterMap.values()
-                            .forEach(caloriesCounter -> filteredUserMealsWithExcess.addAll(caloriesCounter.userMeals.stream()
-                                    .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime))
-                                    .map(userMeal -> createUserMealWithExcess(userMeal, caloriesCounter.calories > caloriesPerDay))
-                                    .collect(Collectors.toList()))
-                            );
-                    return filteredUserMealsWithExcess;
-                };
+                return localDateCaloriesCounterMap -> localDateCaloriesCounterMap.values().stream()
+                        .flatMap(caloriesCounter -> caloriesCounter.filteredUserMeals.stream().map(userMeal -> createUserMealWithExcess(userMeal, caloriesCounter.calories > caloriesPerDay)))
+                        .collect(Collectors.toList());
             }
 
             @Override
