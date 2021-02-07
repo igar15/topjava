@@ -10,30 +10,32 @@
         <h3><a href="index.html">Home</a></h3>
         <hr>
         <h2>Meals</h2>
-        <table border="" cellpadding="5">
-            <thead>
+        <p><a href="meals?action=create">Add Meal</a></p>
+        <c:if test="${mealTos.size() == 0}">
+            <h3>You do not have meals</h3>
+        </c:if>
+        <c:if test="${mealTos.size() > 0}">
+            <table border="" cellpadding="5">
+                <thead>
                 <th>DateTime</th>
                 <th>Description</th>
                 <th>Calories</th>
-            </thead>
-            <tbody align="center">
+                <th>Action</th>
+                </thead>
+                <tbody align="center">
                 <c:forEach var="mealTo" items="${mealTos}">
-                    <c:if test="${mealTo.excess == true}">
-                        <tr style="color: red">
-                            <td><javatime:format value="${mealTo.dateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
-                            <td>${mealTo.description}</td>
-                            <td>${mealTo.calories}</td>
-                        </tr>
-                    </c:if>
-                    <c:if test="${mealTo.excess == false}">
-                        <tr style="color: green">
-                            <td><javatime:format value="${mealTo.dateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
-                            <td>${mealTo.description}</td>
-                            <td>${mealTo.calories}</td>
-                        </tr>
-                    </c:if>
+                    <tr ${mealTo.excess == true ? 'style="color: red"' : 'style="color: green"'}>
+                        <td><javatime:format value="${mealTo.dateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
+                        <td>${mealTo.description}</td>
+                        <td>${mealTo.calories}</td>
+                        <td>
+                            <a href="meals?action=update&id=${mealTo.id}">Update</a> |
+                            <a href="meals?action=delete&id=${mealTo.id}">Delete</a>
+                        </td>
+                    </tr>
                 </c:forEach>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </c:if>
     </body>
 </html>
