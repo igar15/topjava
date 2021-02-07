@@ -20,7 +20,12 @@ import static ru.javawebinar.topjava.util.MealsUtil.*;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
-    private final MealRepository mealRepository = new InMemoryMealRepository();
+    private MealRepository mealRepository;
+
+    @Override
+    public void init() throws ServletException {
+        mealRepository = new InMemoryMealRepository();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

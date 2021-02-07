@@ -12,5 +12,5 @@ public interface MealRepository {
 
     Meal save(Meal meal);
 
-    void deleteById(long id);
+    boolean deleteById(long id);
 }
