@@ -17,7 +17,7 @@ public class InMemoryMealRepository implements MealRepository {
     {
         counter = new AtomicLong(0);
         memoryRepo = new ConcurrentHashMap<>();
-        MealsUtil.MEALS.forEach(this::save);
+        MealsUtil.meals.forEach(this::save);
     }
 
     @Override
@@ -31,28 +31,23 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public synchronized Meal save(Meal meal) {
+    public Meal save(Meal meal) {
         if (meal.getId() == 0) {
             saveToMemoryRepo(meal);
+            return meal;
         } else {
-            Meal memMeal = memoryRepo.get(meal.getId());
-            if (memMeal != null) {
-                memoryRepo.put(meal.getId(), meal);
-            } else {
-                return null;
-            }
+            return memoryRepo.computeIfPresent(meal.getId(), (key, oldValue) -> meal);
         }
-        return meal;
     }
 
     @Override
     public boolean deleteById(long id) {
-        Meal meal = memoryRepo.remove(id);
-        return meal != null;
+        return memoryRepo.remove(id) != null;
     }
 
     private void saveToMemoryRepo(Meal meal) {
-        meal.setId(counter.incrementAndGet());
-        memoryRepo.put(counter.get(), meal);
+        long id = counter.incrementAndGet();
+        meal.setId(id);
+        memoryRepo.put(id, meal);
     }
 }
