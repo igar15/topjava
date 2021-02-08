@@ -15,6 +15,7 @@
             <h3>You do not have meals</h3>
         </c:if>
         <c:if test="${mealTos.size() > 0}">
+            <c:set var="color" value="style=\"color: "/>
             <table border="" cellpadding="5">
                 <thead>
                 <th>DateTime</th>
@@ -24,7 +25,7 @@
                 </thead>
                 <tbody align="center">
                 <c:forEach var="mealTo" items="${mealTos}">
-                    <tr ${mealTo.excess == true ? 'style="color: red"' : 'style="color: green"'}>
+                    <tr ${mealTo.excess ? color.concat('red"') : color.concat('green"')}>
                         <td><javatime:format value="${mealTo.dateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
                         <td>${mealTo.description}</td>
                         <td>${mealTo.calories}</td>

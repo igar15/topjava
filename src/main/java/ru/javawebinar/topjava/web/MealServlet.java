@@ -30,11 +30,7 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action == null) {
-            action = "all";
-        } else {
-            action = action.toLowerCase();
-        }
+        action = (action == null) ? "all" : action.toLowerCase();
 
         switch (action) {
             case "delete":
