@@ -21,6 +21,20 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
+    <form method="get" action="meals">
+<%--        <input type="hidden" value="filter" name="action">--%>
+        <p>
+            Start date (include):  <input type="date" value="${param.startDate}" name="startDate">
+            <span style="margin-left: 30px"></span>
+            End date (include): <input type="date" value="${param.endDate}" name="endDate">
+        </p>
+        <p>
+            Start time (include): <input type="time" value="${param.startTime}" name="startTime">
+            <span style="margin-left: 99px"></span>
+            End time (exclude): <input type="time" value="${param.endTime}" name="endTime">
+        </p>
+        <button type="submit" style="margin-left: 535px">Filter</button>
+    </form>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">

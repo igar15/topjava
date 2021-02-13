@@ -7,9 +7,11 @@ import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.web.SecurityUtil;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.*;
@@ -46,7 +48,19 @@ public class MealRestController {
 
     public List<MealTo> getAll() {
         log.info("getAll for user with id={}", authUserId());
-        return (MealsUtil.getTos(service.getAll(authUserId()), authUserCaloriesPerDay()));
+        List<Meal> meals = service.getAll(authUserId(), LocalDate.MIN, LocalDate.MAX);
+        return MealsUtil.getTos(meals, authUserCaloriesPerDay());
+    }
+
+
+    public List<MealTo> getAllFiltered(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        log.info("getAll filtered for user with id={}", authUserId());
+        startDate = (startDate == null) ? LocalDate.MIN : startDate;
+        endDate = (endDate == null) ? LocalDate.MAX : endDate;
+        startTime = (startTime == null) ? LocalTime.MIN : startTime;
+        endTime = (endTime == null) ? LocalTime.MAX : endTime;
+        List<Meal> meals = service.getAll(authUserId(), startDate, endDate);
+        return MealsUtil.getFilteredTos(meals, authUserCaloriesPerDay(), startTime, endTime);
     }
 
 }
