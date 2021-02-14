@@ -22,7 +22,7 @@
     <hr/>
     <h2>Meals</h2>
     <form method="get" action="meals">
-<%--        <input type="hidden" value="filter" name="action">--%>
+        <input type="hidden" value="filter" name="action">
         <p>
             Start date (include):  <input type="date" value="${param.startDate}" name="startDate">
             <span style="margin-left: 30px"></span>
