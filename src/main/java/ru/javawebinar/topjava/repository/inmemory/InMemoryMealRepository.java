@@ -22,20 +22,16 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(meal -> {
-            if (meal.getDescription().contains("(User_1)")) {
-                this.save(meal, 1);
-            } else {
-                this.save(meal, 2);
-            }
-        });
+        MealsUtil.user1Meals.forEach(meal -> this.save(meal, 1));
+        MealsUtil.user2Meals.forEach(meal -> this.save(meal, 2));
     }
 
     @Override
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            return repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>()).put(meal.getId(), meal);
+            repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>()).put(meal.getId(), meal);
+            return meal;
         }
         // handle case: update, but not present in storage
         ConcurrentHashMap<Integer, Meal> userMealRepo = repository.get(userId);
