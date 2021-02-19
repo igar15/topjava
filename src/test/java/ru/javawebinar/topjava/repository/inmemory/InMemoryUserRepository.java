@@ -1,18 +1,37 @@
 package ru.javawebinar.topjava.repository.inmemory;
 
 import org.springframework.stereotype.Repository;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static ru.javawebinar.topjava.UserTestData.admin;
+import static ru.javawebinar.topjava.UserTestData.user;
+
 
 @Repository
 public class InMemoryUserRepository extends InMemoryBaseRepository<User> implements UserRepository {
 
-    static final int USER_ID = 1;
-    static final int ADMIN_ID = 2;
+    public void init() {
+        try {
+            Field counterField = InMemoryUserRepository.class.getSuperclass().getDeclaredField("counter");
+            counterField.setAccessible(true);
+            AtomicInteger counter = (AtomicInteger) counterField.get(this);
+            counter.set(0);
+            map.clear();
+            map.put(UserTestData.USER_ID, user);
+            map.put(UserTestData.ADMIN_ID, admin);
+            counter.set(2);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public List<User> getAll() {
