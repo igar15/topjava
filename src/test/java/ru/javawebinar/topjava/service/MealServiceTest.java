@@ -3,21 +3,23 @@ package ru.javawebinar.topjava.service;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.javawebinar.topjava.CustomStopwatch;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -32,18 +34,31 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    private static final List<String> testsTimeResults = new ArrayList<>();
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
 
-    @Rule
-    public CustomStopwatch customStopwatch = new CustomStopwatch(testsTimeResults);
-
-    @AfterClass
-    public static void showTestsTimeResults() {
-        testsTimeResults.forEach(System.out::println);
-    }
+    private static final StringBuilder testsTimeResults = new StringBuilder();
 
     @Autowired
     private MealService service;
+
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            logTimeResult(description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
+        }
+
+        private void logTimeResult(String methodName, long millis) {
+            String testTimeResult = String.format("%-30s %d ms", methodName, millis);
+            testsTimeResults.append(testTimeResult).append("\n");
+            log.debug(testTimeResult);
+        }
+    };
+
+    @AfterClass
+    public static void showTestsTimeResults() {
+        log.debug("\n{}", testsTimeResults.toString().trim());
+    }
 
     @Test
     public void delete() {
@@ -76,7 +91,6 @@ public class MealServiceTest {
         assertThrows(DataAccessException.class, () ->
                 service.create(new Meal(null, meal1.getDateTime(), "duplicate", 100), USER_ID));
     }
-
 
     @Test
     public void get() {
