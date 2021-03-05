@@ -6,6 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.service.abstracts.AbstractUserServiceTest;
 
 import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.MealTestData.meals;
@@ -13,7 +14,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_MATCHER;
 
 @ActiveProfiles(profiles = Profiles.DATAJPA)
-public class UserServiceDataJpaTest extends AbstractServiceTest {
+public class UserServiceDataJpaTest extends AbstractUserServiceTest {
 
     @Autowired
     private UserService service;

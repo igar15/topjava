@@ -6,13 +6,14 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.service.abstracts.AbstractMealServiceTest;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 import static ru.javawebinar.topjava.UserTestData.user;
 
 @ActiveProfiles(profiles = Profiles.DATAJPA)
-public class MealServiceDataJpaTest extends AbstractServiceTest {
+public class MealServiceDataJpaTest extends AbstractMealServiceTest {
 
     @Autowired
     private MealService service;

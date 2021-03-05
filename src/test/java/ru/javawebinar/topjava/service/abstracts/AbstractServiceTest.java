@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.service;
+package ru.javawebinar.topjava.service.abstracts;
 
 import org.junit.AfterClass;
 import org.junit.Rule;
