@@ -30,7 +30,7 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
                                   @Param("endDateTime") LocalDateTime endDateTime,
                                   @Param("userId") int userId);
 
-    @EntityGraph(attributePaths = "user")
+    @EntityGraph(attributePaths = {"user", "user.roles"})
     @Query("SELECT m FROM Meal m WHERE m.id=:id and m.user.id=:userId")
     Meal getByIdAndUserIdWithUser(@Param("id") int id, @Param("userId") int userId);
 }

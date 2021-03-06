@@ -5,26 +5,27 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Repository
 @Profile("hsqldb")
-public class JdbcMealRepositoryHsqldb extends JdbcMealRepository {
+public class HsqldbJdbcMealRepository extends AbstractJdbcMealRepository {
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public JdbcMealRepositoryHsqldb(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public HsqldbJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
     @Override
     public <T> T convertDateTime(LocalDateTime dateTime, Class<T> targetClass) {
-        return targetClass.cast(dateTime.format(dateTimeFormatter));
+        return targetClass.cast(Timestamp.valueOf(dateTime));
     }
 
     @Override
-    public Class<?> getDateTimeTargetClass() {
-        return String.class;
+    protected Class<?> getDateTimeTargetClass() {
+        return Timestamp.class;
     }
 }

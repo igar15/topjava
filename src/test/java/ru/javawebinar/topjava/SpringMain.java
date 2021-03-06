@@ -19,7 +19,7 @@ public class SpringMain {
         // java 7 automatic resource management (ARM)
         try (GenericXmlApplicationContext appCtx = new GenericXmlApplicationContext()) {
             ConfigurableEnvironment environment = appCtx.getEnvironment();
-            environment.setActiveProfiles("postgres", "datajpa");
+            environment.setActiveProfiles(Profiles.getActiveDbProfile(), Profiles.DATAJPA);
             appCtx.load("spring/spring-app.xml", "spring/spring-db.xml");
             appCtx.refresh();
 

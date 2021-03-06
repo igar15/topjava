@@ -18,7 +18,7 @@ public interface CrudUserRepository extends JpaRepository<User, Integer> {
 
     User getByEmail(String email);
 
-    @EntityGraph(attributePaths = "meals")
+    @EntityGraph(attributePaths = {"roles", "meals"})
     @Query("SELECT u FROM User u WHERE u.id=:id")
     User getByIdWithMeals(@Param("id") int id);
 }
