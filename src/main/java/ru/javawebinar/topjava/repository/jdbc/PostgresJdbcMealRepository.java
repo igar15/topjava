@@ -16,12 +16,7 @@ public class PostgresJdbcMealRepository extends AbstractJdbcMealRepository{
     }
 
     @Override
-    protected <T> T convertDateTime(LocalDateTime dateTime, Class<T> targetClass) {
-        return targetClass.cast(dateTime);
-    }
-
-    @Override
-    protected Class<?> getDateTimeTargetClass() {
-        return LocalDateTime.class;
+    protected LocalDateTime convertDateTime(LocalDateTime dateTime) {
+        return dateTime;
     }
 }

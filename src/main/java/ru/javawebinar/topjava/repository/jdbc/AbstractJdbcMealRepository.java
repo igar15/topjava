@@ -40,7 +40,7 @@ public abstract class AbstractJdbcMealRepository implements MealRepository {
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", convertDateTime(meal.getDateTime(), getDateTimeTargetClass()))
+                .addValue("date_time", convertDateTime(meal.getDateTime()))
                 .addValue("user_id", userId);
 
         if (meal.isNew()) {
@@ -77,13 +77,10 @@ public abstract class AbstractJdbcMealRepository implements MealRepository {
 
     @Override
     public final List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-
         return jdbcTemplate.query(
                 "SELECT * FROM meals WHERE user_id=?  AND date_time >=  ? AND date_time < ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, convertDateTime(startDateTime, getDateTimeTargetClass()), convertDateTime(endDateTime, getDateTimeTargetClass()));
+                ROW_MAPPER, userId, convertDateTime(startDateTime), convertDateTime(endDateTime));
     }
 
-    protected abstract <T> T convertDateTime(LocalDateTime dateTime, Class<T> targetClass);
-
-    protected abstract Class<?> getDateTimeTargetClass();
+    protected abstract Object convertDateTime(LocalDateTime dateTime);
 }
