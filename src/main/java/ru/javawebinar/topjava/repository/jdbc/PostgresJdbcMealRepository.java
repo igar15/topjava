@@ -15,6 +15,7 @@ public class PostgresJdbcMealRepository extends AbstractJdbcMealRepository{
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected LocalDateTime convertDateTime(LocalDateTime dateTime) {
         return dateTime;

@@ -16,6 +16,7 @@ public class HsqldbJdbcMealRepository extends AbstractJdbcMealRepository {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Timestamp convertDateTime(LocalDateTime dateTime) {
         return Timestamp.valueOf(dateTime);

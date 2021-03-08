@@ -21,10 +21,10 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
     int delete(@Param("id") int id, @Param("userId") int userId);
 
     @Query("SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:userId")
-    Optional<Meal> getByIdAndUser_Id(@Param("id") int id, @Param("userId") int userId);
+    Optional<Meal> get(@Param("id") int id, @Param("userId") int userId);
 
     @Query("SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC")
-    List<Meal> getAllByUser_IdOrderByDateTimeDesc(@Param("userId") int userId);
+    List<Meal> getAll(@Param("userId") int userId);
 
     @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime >= :startDateTime " +
             "AND m.dateTime < :endDateTime ORDER BY m.dateTime DESC")
@@ -34,5 +34,5 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
 
     @EntityGraph(attributePaths = {"user", "user.roles"})
     @Query("SELECT m FROM Meal m WHERE m.id=:id and m.user.id=:userId")
-    Meal getByIdAndUserIdWithUser(@Param("id") int id, @Param("userId") int userId);
+    Meal getWithUser(@Param("id") int id, @Param("userId") int userId);
 }
