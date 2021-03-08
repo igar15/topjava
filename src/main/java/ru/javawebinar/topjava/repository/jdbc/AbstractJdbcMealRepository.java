@@ -14,7 +14,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public abstract class AbstractJdbcMealRepository implements MealRepository {
+public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
 
     protected static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
@@ -82,5 +82,5 @@ public abstract class AbstractJdbcMealRepository implements MealRepository {
                 ROW_MAPPER, userId, convertDateTime(startDateTime), convertDateTime(endDateTime));
     }
 
-    protected abstract <T> T convertDateTime(LocalDateTime dateTime);
+    protected abstract T convertDateTime(LocalDateTime dateTime);
 }

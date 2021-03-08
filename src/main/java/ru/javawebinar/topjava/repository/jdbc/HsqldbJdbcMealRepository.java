@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 
 @Repository
 @Profile("hsqldb")
-public class HsqldbJdbcMealRepository extends AbstractJdbcMealRepository {
+public class HsqldbJdbcMealRepository extends AbstractJdbcMealRepository<Timestamp> {
 
     public HsqldbJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Timestamp convertDateTime(LocalDateTime dateTime) {
         return Timestamp.valueOf(dateTime);
