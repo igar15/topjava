@@ -6,7 +6,17 @@ import org.springframework.lang.NonNull;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class ValidationUtil {
+
+    private static final Validator entityValidator = Validation.buildDefaultValidatorFactory().getValidator();
+
     private ValidationUtil() {
     }
 
@@ -50,5 +60,24 @@ public class ValidationUtil {
     public static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
+    }
+
+    public static <T> void validateEntity(T entity) {
+        Set<ConstraintViolation<T>> validationErrors = entityValidator.validate(entity);
+        if (validationErrors.size() > 0) {
+            String errorMessages = validationErrors.stream()
+                    .map(ConstraintViolation::toString)
+                    .collect(Collectors.joining("\n"));
+            StringBuilder exceptionMessageBuilder = new StringBuilder();
+            exceptionMessageBuilder.append("Validation failed for class ")
+                    .append(entity.getClass().getName())
+                    .append("\n")
+                    .append("List of constraint violations:[")
+                    .append("\n")
+                    .append(errorMessages)
+                    .append("\n")
+                    .append("]");
+            throw new ConstraintViolationException(exceptionMessageBuilder.toString(), validationErrors);
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
+import ru.javawebinar.topjava.util.ValidationUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -49,6 +50,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
+        ValidationUtil.validateEntity(user);
         return transactionTemplate.execute(status -> {
             BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
