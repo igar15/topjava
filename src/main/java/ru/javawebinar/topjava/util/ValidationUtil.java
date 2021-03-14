@@ -69,8 +69,8 @@ public class ValidationUtil {
                     .map(ConstraintViolation::toString)
                     .collect(Collectors.joining("\n"));
             StringBuilder exceptionMessageBuilder = new StringBuilder();
-            exceptionMessageBuilder.append("Validation failed for class ")
-                    .append(entity.getClass().getName())
+            exceptionMessageBuilder.append("Validation failed for ")
+                    .append(entity)
                     .append("\n")
                     .append("List of constraint violations:[")
                     .append("\n")

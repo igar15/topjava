@@ -9,8 +9,8 @@
 
 <section>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <h3><spring:message code="${meal.id == null ? 'meal.create' : 'meal.edit'}"/></h3>
-    <form method="post" action="${pageContext.request.contextPath}/meals">
+    <h3><spring:message code="${meal.isNew() ? 'meal.create' : 'meal.edit'}"/></h3>
+    <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt><spring:message code="meal.date"/>:</dt>
@@ -24,8 +24,8 @@
             <dt><spring:message code="meal.calories"/>:</dt>
             <dd><input type="number" value="${meal.calories}" name="calories" required></dd>
         </dl>
-        <button type="submit">Save</button>
-        <button onclick="window.history.back()" type="button">Cancel</button>
+        <button type="submit"><spring:message code="meal.save"/></button>
+        <button onclick="window.history.back()" type="button"><spring:message code="meal.cancel"/></button>
     </form>
 </section>
 <jsp:include page="fragments/footer.jsp"/>

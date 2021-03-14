@@ -71,11 +71,6 @@
               class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
             <property name="dataSource" ref="dataSource" />
         </bean>
-
-        <bean id="transactionTemplate"
-              class="org.springframework.transaction.support.TransactionTemplate">
-            <property name="transactionManager" ref="transactionManager" />
-        </bean>
     </beans>
 
     <beans profile="jpa,datajpa">

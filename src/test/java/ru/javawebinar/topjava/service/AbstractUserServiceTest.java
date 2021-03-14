@@ -1,16 +1,10 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
-import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.repository.JpaUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
@@ -26,21 +20,6 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     protected UserService service;
 
-    @Autowired
-    private CacheManager cacheManager;
-
-    @Autowired
-    @Lazy
-    protected JpaUtil jpaUtil;
-
-    @Before
-    public void setup() {
-        cacheManager.getCache("users").clear();
-        if (isJdbcProfileDisabled()) {
-            jpaUtil.clear2ndLevelHibernateCache();
-        }
-    }
-
     @Test
     public void create() {
         User created = service.create(getNew());
@@ -52,9 +31,22 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    public void createWithoutRoles() {
+        User userWithoutRoles = getNew();
+        userWithoutRoles.setRoles(null);
+        User created = service.create(userWithoutRoles);
+        int newId = created.id();
+        User newUserWithoutRoles = getNew();
+        newUserWithoutRoles.setRoles(null);
+        newUserWithoutRoles.setId(newId);
+        USER_MATCHER.assertMatch(created, newUserWithoutRoles);
+        USER_MATCHER.assertMatch(service.get(newId), newUserWithoutRoles);
+    }
+
+    @Test
     public void duplicateMailCreate() {
         assertThrows(DataAccessException.class, () ->
-                service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.USER)));
+                service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.USER, Role.ADMIN)));
     }
 
     @Test
@@ -70,8 +62,8 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void get() {
-        User user = service.get(USER_ID);
-        USER_MATCHER.assertMatch(user, UserTestData.user);
+        User user = service.get(ADMIN_ID);
+        USER_MATCHER.assertMatch(user, admin);
     }
 
     @Test
@@ -93,6 +85,16 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    public void updateWithRolesDeleting() {
+        User updatedWithoutRoles = getUpdated();
+        updatedWithoutRoles.setRoles(null);
+        service.update(updatedWithoutRoles);
+        User updated = getUpdated();
+        updated.setRoles(null);
+        USER_MATCHER.assertMatch(service.get(USER_ID), updated);
+    }
+
+    @Test
     public void getAll() {
         List<User> all = service.getAll();
         USER_MATCHER.assertMatch(all, admin, user);
@@ -100,7 +102,6 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void createWithException() throws Exception {
-        Assume.assumeTrue(isJdbcProfileDisabled());
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "  ", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)));
