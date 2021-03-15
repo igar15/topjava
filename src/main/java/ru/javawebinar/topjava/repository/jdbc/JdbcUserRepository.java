@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
@@ -104,21 +105,20 @@ public class JdbcUserRepository implements UserRepository {
             }
         }
 
-        Map<Integer, List<UserRole>> groupedUserRoles = jdbcTemplate.query("SELECT * FROM user_roles",
+        Map<Integer, List<Role>> groupedUserRoles = jdbcTemplate.query("SELECT * FROM user_roles",
                 (rs, rowNum) -> new UserRole(rs.getInt("user_id"), Role.valueOf(rs.getString("role"))))
                 .stream()
-                .collect(Collectors.groupingBy(userRole -> userRole.userId));
-        users.forEach(user -> user.setRoles(groupedUserRoles.get(user.getId()).stream()
-                .map(userRole -> userRole.role).collect(Collectors.toList())));
+                .collect(Collectors.groupingBy(userRole -> userRole.userId, Collectors.mapping(userRole -> userRole.role, Collectors.toList())));
+        users.forEach(user -> user.setRoles(groupedUserRoles.get(user.getId())));
         return users;
     }
 
     private void insertUserRoles(User user) {
-        if (user.getRoles() != null && user.getRoles().size() > 0) {
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            List<Role> roles = new ArrayList<>(user.getRoles());
             jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) VALUES (?, ?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    List<Role> roles = new ArrayList<>(user.getRoles());
                     ps.setInt(1, user.getId());
                     ps.setString(2, roles.get(i).name());
                 }
